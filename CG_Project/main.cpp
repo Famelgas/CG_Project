@@ -9,7 +9,7 @@
 #include <GLUT/glut.h>
 #define PI         3.14159
 
-//--------------------------------- Definir cores
+// Cores
 #define RED      1.0, 0.0, 0.0, 1.0
 #define GREEN    0.0, 1.0, 0.0, 1.0
 #define BLUE     0.0, 0.0, 1.0, 1.0
@@ -21,8 +21,8 @@
 #define GRAY     0.3, 0.3, 0.3, 1.0
 
 
-GLint        wScreen = 700, hScreen = 600;        //.. janela - pixeis
-GLfloat        SIZE = 10.0;    //.. Mundo  SIZE=coordenadas x=y=z
+GLint        wScreen = 700, hScreen = 600;
+GLfloat        SIZE = 10.0;
 
 
 
@@ -30,15 +30,20 @@ GLfloat pos[] = { 0., 0., 0.};
 
 GLfloat rotation = 0.;
 GLfloat speed = 1.;
+GLfloat rodMov = -23.5;
+GLfloat cable = 0.3;
 
-
-GLint sempreRodar = 0;
-GLfloat altura = 0;
+GLint alwaysON = 0;
+GLfloat altura = 0.;
 GLfloat incALT = 0.1;
 GLint faceVisivel = 0;
+GLfloat wheelRadius = 0.7;
+GLfloat wheelHeight = 0.3;
+GLint view = 0;
 
 
-GLfloat rVisao = 8, aVisao = -0.5 * PI, incVisao = 1;
+
+GLfloat rVisao = 8, aVisao = -0.5 * PI, incVisao = 3;
 GLfloat obsP[] = { rVisao * cos(aVisao), 2.0, rVisao * sin(aVisao) };
 float anguloZ = 35;
 
@@ -214,37 +219,15 @@ void draw_cube() {
     glPushMatrix();
 }
 
+void draw_wheels() {
+//    glTranslatef(-1., 0., -1.);
+    glPushMatrix();
+    draw_cylinder(wheelRadius, wheelHeight);
+    glPopMatrix();
+}
+
 
 void draw_truck() {
-    
-    // draw base
-    glColor4f(BLUE);
-    glPushMatrix();
-    glTranslatef(0., 0., 0.);
-    glScalef(4., 1., 2.);
-    draw_cube();
-    glPopMatrix();
-    
-    glColor4f(YELLOW);
-    // draw cabine
-    glPushMatrix();
-    glTranslatef(-0.3, 0.5, 0.);
-    glScalef(1., 1., 2.);
-    draw_cube();
-    glPopMatrix();
-    
-    // draw rod
-    glColor4f(RED);
-    glPushMatrix();
-    glTranslatef(-0.1, 0.3, 0.);
-    glRotatef(90., 0., 1., 0.);
-    glRotatef(-23.5, 0., 0., 0.);
-    draw_cylinder(0.1, 1.4);
-    glPopMatrix();
-    
-    // draw cable
-    
-    // draw winch
     
     
     
@@ -269,9 +252,7 @@ void initialize(void)
 
 
 
-void drawEixos()
-{
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Eixo
+void drawEixos() {
     glColor4f(ORANGE);
     glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
@@ -290,12 +271,8 @@ void drawEixos()
 
 }
 
-
-//======================================
 void drawScene() {
-
-    //==================================== Animanacao MESA
-    if (sempreRodar) {
+    if (alwaysON) {
         rotation = rotation + 1;
         altura = altura + incALT;
         if (altura > 3) incALT = -incALT;
@@ -308,7 +285,76 @@ void drawScene() {
     glRotatef(rotation, 0.0, 1.0, 0.0);
     glScalef(2.5, 2.0, 2.5);
     
-    draw_truck();
+    // draw base
+    glColor4f(BLUE);
+    glPushMatrix();
+    glTranslatef(0., 0., 0.);
+    glScalef(4., 1., 2.);
+    draw_cube();
+    glPopMatrix();
+
+    glColor4f(YELLOW);
+    // draw cabine
+    glPushMatrix();
+    glTranslatef(-0.3, 0.5, 0.);
+    glScalef(1., 1., 2.);
+    draw_cube();
+    glPopMatrix();
+    
+    // draw rod
+    glColor4f(RED);
+    glPushMatrix();
+    glTranslatef(-0.03, 0.3, 0.);
+    glRotatef(90., 0., 1., 0.);
+    glTranslatef(0.03, -0.3, 0.);
+    glRotatef(rodMov, 0., 0., 0.);
+    glTranslatef(-0.03, 0.3, 0.);
+    draw_cylinder(0.1, 1.4);
+    
+    
+    // draw cable
+    glColor4f(GREEN);
+    glTranslatef(0., -0.1, 1.35);
+    glRotatef(90., 0., 0., 0.);
+    glRotatef(-rodMov, 0., 0., 0.);
+    
+    draw_cylinder(0.01, cable);
+    // draw winch
+    glColor4f(CYAN);
+    glTranslatef(0., 0., cable);
+    draw_cylinder(0.025, 0.1);
+    
+    glPopMatrix();
+    
+    // front left
+    glColor4f(WHITE);
+    glPushMatrix();
+    glTranslatef(-0.5, -0.25, 0.45);
+    draw_cylinder(0.2, 0.1);
+    glPopMatrix();
+    
+    // back left
+    glColor4f(WHITE);
+    glPushMatrix();
+    glTranslatef(0.5, -0.25, 0.45);
+    draw_cylinder(0.2, 0.1);
+    glPopMatrix();
+    
+    // front right
+    glColor4f(WHITE);
+    glPushMatrix();
+    glTranslatef(-0.5, -0.25, -0.55);
+    draw_cylinder(0.2, 0.1);
+    glPopMatrix();
+    
+    // back right
+    glColor4f(WHITE);
+    glPushMatrix();
+    glTranslatef(0.5, -0.25, -0.55);
+    draw_cylinder(0.2, 0.1);
+    glPopMatrix();
+    
+    
     glPopMatrix();
 
     glColor4f(YELLOW);
@@ -316,17 +362,10 @@ void drawScene() {
 }
 
 
-
-
-//======================================================
-//======================================================
 void display(void) {
 
-    //================================================================= APaga
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        
-    //================================================================= Viewport 2
     glViewport(0,0, wScreen, hScreen);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -335,20 +374,16 @@ void display(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    //======================================================
-    //  <><><><><><><>         OBSERVADOR NAO EST¡ FIXO ????
-    // gluLookAt(obsP[0], obsP[1], obsP[2], 0, 0, 0, 0, 1, 0);
-    //======================================================
-     gluLookAt(5,3,5, 0, 0, 0, 0, 1, 0);
-
+    if (!view) {
+        gluLookAt(obsP[0], obsP[1], obsP[2], 0, 0, 0, 0, 1, 0);
+    }
+    else {
+        gluLookAt(0, 10, 0, 0, 0, 0, obsP[0], 0, obsP[2]);
+    }
     
-    //ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖObjectos
     drawEixos();
-
     drawScene();
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Actualizacao
     glutSwapBuffers();
 }
 
@@ -385,6 +420,39 @@ void keyboard(unsigned char key, int x, int y) {
         pos[2] = pos[2] - speed * sin(rotation * PI / 180.);
         glutPostRedisplay();
             break;
+    
+    case 'Q': case 'q':
+        rodMov -= 3.;
+        glutPostRedisplay();
+        break;
+    
+    case 'E': case 'e':
+        rodMov += 3.;
+        glutPostRedisplay();
+        break;
+        
+    case 'R': case 'r':
+        cable -= 0.05;
+        glutPostRedisplay();
+        break;
+   
+    case 'F': case 'f':
+        cable += 0.05;
+        glutPostRedisplay();
+        break;
+       
+    
+    case 'C': case 'c':
+        if (view) {
+            view = 0;
+        }
+        else {
+            view = 1;
+        }
+        glutPostRedisplay();
+        break;
+       
+        
     case 27:
         exit(0);
         break;
@@ -399,13 +467,24 @@ void teclasNotAscii(int key, int x, int y) {
     //=========================================================
     //  <><><><><><>  Movimento do observador  ???
     //=========================================================
-    if (key == GLUT_KEY_UP);    // Movimento para cima
-    if (key == GLUT_KEY_DOWN);  // Movimento para baixo
-    if (key == GLUT_KEY_LEFT);  // Movimento para a esquerda
-    if (key == GLUT_KEY_RIGHT); // Movimento para a direira
-    
+    if (key == GLUT_KEY_UP) {
+        obsP[1] += 0.5;
+    }
+    if (key == GLUT_KEY_DOWN) {
+        obsP[1] -= 0.5;
+    }
+    if (key == GLUT_KEY_LEFT) {
+        aVisao += incVisao;
+    }
+    if (key == GLUT_KEY_RIGHT) {
+        aVisao -= incVisao;
+    }
+    obsP[0] = rVisao * cos(aVisao * PI / 180.);
+    obsP[2] = rVisao * sin(aVisao * PI / 180.);
+
     glutPostRedisplay();
 }
+
 
 
 //======================================================= MAIN
