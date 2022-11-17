@@ -32,6 +32,7 @@ GLfloat rotation = 0.;
 GLfloat speed = 1.;
 GLfloat rodMov = -23.5;
 GLfloat cable = 0.3;
+GLfloat incCable = 0.05;
 
 GLint alwaysON = 0;
 GLfloat altura = 0.;
@@ -127,40 +128,6 @@ static GLfloat normais[] = {
     0.0,  0.0,  -1.0,
 };
 
-static GLfloat colors[] = {
-    //Esquerda
-    1,  0, 0,// 0
-    1,  0, 0,// 1
-    1,  0, 0,// 2
-    1,  0, 0,// 3
-    //Direita
-    1,  0, 0,// 4
-    1,  0, 0,// 5
-    1,  0, 0,// 6
-    1,  0, 0,// 7
-    //Cima
-    1,  0, 0,// 8
-    1,  0, 0,// 9
-    1,  0, 0,// 10
-    1,  0, 0,// 11
-    //Baixo
-    1,  0, 0,// 12
-    1,  0, 0,// 13
-    1,  0, 0,// 14
-    1,  0, 0,// 15
-    //Frente
-    1,  0, 0,// 16
-    1,  0, 0,// 17
-    1,  0, 0,// 18
-    1,  0, 0,// 19
-    //Tras
-    1,  0, 0,// 20
-    1,  0, 0,// 21
-    1,  0, 0,// 22
-    1,  0, 0,// 23
-};
-
-
 void draw_cylinder(GLfloat radius, GLfloat height) {
     GLfloat x              = 0.0;
     GLfloat y              = 0.0;
@@ -219,29 +186,11 @@ void draw_cube() {
     glPushMatrix();
 }
 
-void draw_wheels() {
-//    glTranslatef(-1., 0., -1.);
-    glPushMatrix();
-    draw_cylinder(wheelRadius, wheelHeight);
-    glPopMatrix();
-}
-
-
-void draw_truck() {
-    
-    
-    
-}
-
-
 void initialize(void)
 {
     glClearColor(BLACK);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
-
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
 
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -249,8 +198,6 @@ void initialize(void)
     glEnableClientState(GL_NORMAL_ARRAY);
     
 }
-
-
 
 void drawEixos() {
     glColor4f(ORANGE);
@@ -273,10 +220,9 @@ void drawEixos() {
 
 void drawScene() {
     if (alwaysON) {
-        rotation = rotation + 1;
-        altura = altura + incALT;
-        if (altura > 3) incALT = -incALT;
-        if (altura < -1) incALT = -incALT;
+        cable = cable + incCable;
+        if (cable > 1) incCable = -incCable;
+        if (cable < 0) incCable = -incCable;
     }
 
     glPushMatrix();
@@ -361,7 +307,6 @@ void drawScene() {
     glTranslatef(0, tam + 0.3, 0.0);
 }
 
-
 void display(void) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -388,13 +333,11 @@ void display(void) {
 }
 
 
-void Timer(int value)
-{
+void Timer(int value) {
     glutPostRedisplay();
     glutTimerFunc(msec, Timer, 1);
 }
 
-//======================================================= EVENTOS
 void keyboard(unsigned char key, int x, int y) {
 
 
@@ -442,12 +385,21 @@ void keyboard(unsigned char key, int x, int y) {
         break;
        
     
-    case 'C': case 'c':
+    case 'V': case 'v':
         if (view) {
             view = 0;
         }
         else {
             view = 1;
+        }
+        glutPostRedisplay();
+        break;
+    case 'T': case 't':
+        if (alwaysON) {
+            alwaysON = 0;
+        }
+        else {
+            alwaysON = 1;
         }
         glutPostRedisplay();
         break;
@@ -463,10 +415,6 @@ void keyboard(unsigned char key, int x, int y) {
 
 
 void teclasNotAscii(int key, int x, int y) {
-    
-    //=========================================================
-    //  <><><><><><>  Movimento do observador  ???
-    //=========================================================
     if (key == GLUT_KEY_UP) {
         obsP[1] += 0.5;
     }
@@ -485,17 +433,13 @@ void teclasNotAscii(int key, int x, int y) {
     glutPostRedisplay();
 }
 
-
-
-//======================================================= MAIN
-//======================================================= MAIN
 int main(int argc, char** argv) {
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(wScreen, hScreen);
     glutInitWindowPosition(400, 100);
-    glutCreateWindow("Filipe Mendes");
+    glutCreateWindow("Filipe Mendes | Movement: w/s and a/d | Observer: Arrow keys | View: v | Crane: q/e | Hook: r/f and t");
 
     initialize();
 
@@ -508,6 +452,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
-
-
